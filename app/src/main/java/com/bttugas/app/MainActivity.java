@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,8 +25,7 @@ import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final UUID MY_UUID_INSECURE =
-            UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
+    private static final UUID MY_UUID_INSECURE = UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
 
     private static final int REQUEST_ENABLE_BT = 1;
     BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -41,12 +41,13 @@ public class MainActivity extends AppCompatActivity {
     public void pairDevice(View v) {
 
         Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
-        Log.e("MAinActivity", "" + pairedDevices.size());
+        Log.e("MainActivity", "" + pairedDevices.size());
         if (pairedDevices.size() > 0) {
             Object[] devices = pairedDevices.toArray();
             BluetoothDevice device = (BluetoothDevice) devices[0];
             //ParcelUuid[] uuid = device.getUuids();
-            Log.e("MAinActivity", "" + device);
+            Log.e("MainActivity", "" + device);
+            Toast.makeText(getApplicationContext(),"" + device,Toast.LENGTH_LONG).show();
             //Log.e("MAinActivity", "" + uuid)
 
             ConnectThread connect = new ConnectThread(device, MY_UUID_INSECURE);
@@ -114,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void connected(BluetoothSocket mmSocket) {
         Log.d(TAG, "connected: Starting.");
+//        Toast.makeText(getApplicationContext(),"Connected: Starting",Toast.LENGTH_LONG).show();
 
         // Start the thread to manage the connection and perform transmissions
         mConnectedThread = new ConnectedThread(mmSocket);
@@ -127,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
 
         public ConnectedThread(BluetoothSocket socket) {
             Log.d(TAG, "ConnectedThread: Starting.");
+//            Toast.makeText(getApplicationContext(),"ConnectedThread: Starting",Toast.LENGTH_LONG).show();
 
             mmSocket = socket;
             InputStream tmpIn = null;
@@ -161,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
 
                         @Override
                         public void run() {
-                            view_data.setText(incomingMessage);
+                            view_data.setText("Message :" + incomingMessage);
                         }
                     });
 
@@ -177,10 +180,12 @@ public class MainActivity extends AppCompatActivity {
         public void write(byte[] bytes) {
             String text = new String(bytes, Charset.defaultCharset());
             Log.d(TAG, "write: Writing to outputstream: " + text);
+            Toast.makeText(getApplicationContext(),"Sending: " + text,Toast.LENGTH_LONG).show();
             try {
                 mmOutStream.write(bytes);
             } catch (IOException e) {
                 Log.e(TAG, "write: Error writing to output stream. " + e.getMessage());
+                Toast.makeText(getApplicationContext(),"Error sending message",Toast.LENGTH_LONG).show();
             }
         }
 
@@ -238,6 +243,7 @@ public class MainActivity extends AppCompatActivity {
                 tmp = bluetoothAdapter.listenUsingInsecureRfcommWithServiceRecord("appname", MY_UUID_INSECURE);
 
                 Log.d(TAG, "AcceptThread: Setting up Server using: " + MY_UUID_INSECURE);
+                Toast.makeText(getApplicationContext(),"AcceptThread: Setting up Server using: " + MY_UUID_INSECURE,Toast.LENGTH_LONG).show();
             } catch (IOException e) {
                 Log.e(TAG, "AcceptThread: IOException: " + e.getMessage());
             }

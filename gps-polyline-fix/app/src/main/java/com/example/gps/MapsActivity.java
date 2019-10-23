@@ -13,34 +13,33 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
+import com.example.gps.Response.Response;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.example.gps.Retrofit.ApiClient;
+import com.example.gps.Retrofit.Server;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private LocationManager lm;
-    private LocationListener ll;
     private lokasiListener mylocationListener;
-    private Polyline pl;
-    public List<LatLng> point;
+
     private LatLng current = null;
     private LatLng before = null;
-    private LatLng myPos = null;
+
+    private ApiClient mApiClient;
 
     private class lokasiListener implements LocationListener {
         private TextView txtLat, txtLong;
@@ -121,6 +120,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         mylocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2, 2, mylocationListener);
         mylocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 2, 2, mylocationListener);
+
+        mApiClient = Server.getClient().create(ApiClient.class);
     }
 
 
@@ -143,6 +144,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void tambahGaris(){
         Polyline poli = mMap.addPolyline(new PolylineOptions().add(current).add(before));
+
+        Call<Response> store = mApiClient.store_location(current.latitude, current.longitude);
+        store.enqueue(new Callback<Response>() {
+            @Override
+            public void onResponse(Call<Response> call, retrofit2.Response<Response> response) {
+
+            }
+
+            @Override
+            public void onFailure(Call<Response> call, Throwable t) {
+
+            }
+        });
+
         poli.setWidth(10f);
         poli.setColor(Color.BLUE);
     }

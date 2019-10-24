@@ -8,7 +8,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 
 public class Server {
-    private static final String BASE_URL = "http://mobile.if.its.ac.id/gps-mobile/api/coordinate/5116100120/";
+    private static String nrp = "05111640000120";
+    private static final String BASE_URL = "http://mobile.if.its.ac.id/gps-mobile/api/coordinate/" + nrp + "/";
     private static Retrofit retrofit = null;
 
     public static Retrofit getClient() {

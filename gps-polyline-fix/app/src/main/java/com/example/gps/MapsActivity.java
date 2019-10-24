@@ -16,7 +16,7 @@ import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.gps.Response.Response;
+import com.example.gps.Response.ApiResponse;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -66,7 +66,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 before = new LatLng(current.latitude, current.longitude);
                 current = new LatLng(location.getLatitude(), location.getLongitude());
                 tambahGaris();
-                Toast.makeText(getBaseContext(), "GPS Capture:" + location.getLatitude() + " " + location.getLongitude() + " before" + before.latitude + " " + before.longitude, Toast.LENGTH_LONG).show();
+//                Toast.makeText(getBaseContext(), "GPS Capture:" + location.getLatitude() + " " + location.getLongitude() + " before" + before.latitude + " " + before.longitude, Toast.LENGTH_LONG).show();
             }
 //            if(myPos == null) {
 //                myPos = new LatLng(latitude, longitude);
@@ -145,16 +145,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void tambahGaris(){
         Polyline poli = mMap.addPolyline(new PolylineOptions().add(current).add(before));
 
-        Call<Response> store = mApiClient.store_location(current.latitude, current.longitude);
-        store.enqueue(new Callback<Response>() {
+        Call<ApiResponse> store = mApiClient.store_location(current.latitude, current.longitude);
+        store.enqueue(new Callback<ApiResponse>() {
             @Override
-            public void onResponse(Call<Response> call, retrofit2.Response<Response> response) {
-
+            public void onResponse(Call<ApiResponse> call, retrofit2.Response<ApiResponse> response) {
+                if(response.body().getStatus().equals("success")){
+                    Toast.makeText(MapsActivity.this, "Record uploaded", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
-            public void onFailure(Call<Response> call, Throwable t) {
-
+            public void onFailure(Call<ApiResponse> call, Throwable t) {
+                Toast.makeText(MapsActivity.this, "Uploading record failed", Toast.LENGTH_SHORT).show();
             }
         });
 

@@ -128,11 +128,12 @@ public class MainActivity extends AppCompatActivity {
                 if(response.code() == 200)
                     Toast.makeText(MainActivity.this, "Upload berhasil", Toast.LENGTH_SHORT).show();
                 else
-                    Toast.makeText(MainActivity.this, response.body().getMessage().toString(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Upload gagal", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(Call<ApiResponse> call, Throwable t) {
+                Toast.makeText(MainActivity.this, "Upload gagal", Toast.LENGTH_SHORT).show();
             }
         });
 

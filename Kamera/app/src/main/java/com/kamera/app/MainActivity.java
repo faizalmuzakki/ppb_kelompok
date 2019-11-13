@@ -130,8 +130,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<ApiResponse> call, Throwable t) {
-                Toast.makeText(MainActivity.this, "Upload gagal", Toast.LENGTH_SHORT).show();
+            public void onFailure(Call<ApiResponse> call, Response<ApiResponse> response, Throwable t) {
+                Toast.makeText(MainActivity.this, response.body().getMessage().toString(), Toast.LENGTH_SHORT).show();
             }
         });
 

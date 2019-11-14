@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        encodedImage = "data:/image/png,base64," + encodedImage;
+        encodedImage = "data:image/png;base64," + encodedImage;
 
         ApiClient api = Server.getClient().create(ApiClient.class);
         Call<ApiResponse> store_image = api.store_image(label.getText().toString(), encodedImage);

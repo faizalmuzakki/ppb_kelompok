@@ -127,9 +127,10 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
                 if(response.code() == 201)
                     Toast.makeText(MainActivity.this, "Upload berhasil", Toast.LENGTH_SHORT).show();
-                else
+                else{
                     String.valueOf(response.code());
                     Toast.makeText(MainActivity.this, "Upload gagal", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override

@@ -39,6 +39,8 @@ import java.util.Date;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -49,7 +51,9 @@ public class MainActivity extends AppCompatActivity {
     String nmFile;
     Context context = this;
     EditText label;
-    final int PIC_CROP = 1;
+    final int PIC_CROP = 3;
+    final int CAMERA_CAPTURE = 1;
+    private Uri picUri;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,10 +76,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         b1.setOnClickListener(new View.OnClickListener(){
-
             @Override
             public void onClick(View view) {
-                Intent it=new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                Intent it = new Intent (MediaStore.ACTION_IMAGE_CAPTURE);
+                it.putExtra("android.intent.extras.CAMERA_FACING", 1);
                 File imagesFolder = new File(Environment.getExternalStorageDirectory(),"/HasilTest");
                 if (!imagesFolder.exists()) {
                     imagesFolder.mkdirs();
@@ -86,35 +90,39 @@ public class MainActivity extends AppCompatActivity {
                 nmFile=imagesFolder + File.separator+ s.toString()+".jpg";
                 File image=new File(nmFile);
 
-                Uri uriSavedImage = Uri.fromFile(image);
-                performCrop(uriSavedImage);
+                picUri = Uri.fromFile(image);
                 it.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                it.putExtra(MediaStore.EXTRA_OUTPUT,uriSavedImage);
-                startActivityForResult(it,kodekamera);
+                onSelectImageClick(view);
             }
         });
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == Activity.RESULT_OK){
-            switch (requestCode) {
-                case (kodekamera):
-                    prosesKamera(data);
-                    break;
+       super.onActivityResult(requestCode, resultCode, data);
+
+        // handle result of pick image chooser
+        if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            Uri imageUri = CropImage.getPickImageResultUri(this, data);
+
+            // For API >= 23 we need to check specifically that we have permissions to read external storage.
+            if (CropImage.isReadExternalStoragePermissionsRequired(this, imageUri)) {
+                // request permissions and handle the result in onRequestPermissionsResult()
+                picUri = imageUri;
+            } else {
+                // no permissions required or already grunted, can start crop image activity
+                startCropImageActivity(imageUri);
             }
         }
 
-
-        if (requestCode == PIC_CROP) {
-            if (data != null) {
-                // get the returned data
-                Bundle extras = data.getExtras();
-                // get the cropped bitmap
-                Bitmap selectedBitmap = extras.getParcelable("data");
-
-                iv.setImageBitmap(selectedBitmap);
+        // handle result of CropImageActivity
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                iv.setImageURI(result.getUri());
+                Toast.makeText(this, "Cropping successful", Toast.LENGTH_LONG).show();
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Toast.makeText(this, "Cropping failed: " + result.getError(), Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -178,31 +186,30 @@ public class MainActivity extends AppCompatActivity {
                 this.requestPermissions( new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_WRITE);}
         }
     }
-    private void performCrop(Uri picUri) {
-        try {
-            Intent cropIntent = new Intent("com.android.camera.action.CROP");
-            // indicate image type and Uri
-            cropIntent.setDataAndType(picUri, "image/*");
-            // set crop properties here
-            cropIntent.putExtra("crop", true);
-            // indicate aspect of desired crop
-            cropIntent.putExtra("aspectX", 1);
-            cropIntent.putExtra("aspectY", 1);
-            // indicate output X and Y
-            cropIntent.putExtra("outputX", 128);
-            cropIntent.putExtra("outputY", 128);
-            // retrieve data on return
-            cropIntent.putExtra("return-data", true);
-            // start the activity - we handle returning in onActivityResult
-            startActivityForResult(cropIntent, PIC_CROP);
+
+    public void onSelectImageClick(View view) {
+        CropImage.startPickImageActivity(this);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        if (picUri != null && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            // required permissions granted, start crop image activity
+            startCropImageActivity(picUri);
+        } else {
+            Toast.makeText(this, "Cancelling, required permissions are not granted", Toast.LENGTH_LONG).show();
         }
-        // respond to users whose devices do not support the crop action
-        catch (ActivityNotFoundException anfe) {
-            // display an error message
-            String errorMessage = "Whoops - your device doesn't support the crop action!";
-            Toast toast = Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT);
-            toast.show();
-        }
+    }
+
+    /**
+     * Start crop image activity for the given image.
+     */
+    private void startCropImageActivity(Uri imageUri) {
+        CropImage.activity(imageUri)
+                .setGuidelines(CropImageView.Guidelines.ON)
+                .setAspectRatio(1,1)
+                .setMultiTouchEnabled(true)
+                .start(this);
     }
 
 }

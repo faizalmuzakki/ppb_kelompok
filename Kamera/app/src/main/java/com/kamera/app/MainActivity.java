@@ -147,8 +147,10 @@ public class MainActivity extends AppCompatActivity {
         store_image.enqueue(new Callback<ApiResponse>() {
             @Override
             public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
-                if(response.code() == 201)
+                if(response.code() == 201) {
                     Toast.makeText(MainActivity.this, "Upload berhasil", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(MainActivity.this, result_activity.class);
+                }
                 else{
                     String.valueOf(response.code());
                     Toast.makeText(MainActivity.this, "Upload gagal", Toast.LENGTH_SHORT).show();
@@ -161,9 +163,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        iv.setImageResource(android.R.color.transparent);
-        label.setVisibility(View.GONE);
-        btnUpload.setVisibility(View.GONE);
+//        iv.setImageResource(android.R.color.transparent);
+//        label.setVisibility(View.GONE);
+//        btnUpload.setVisibility(View.GONE);
     }
 
     private void prosesKamera(Intent datanya){

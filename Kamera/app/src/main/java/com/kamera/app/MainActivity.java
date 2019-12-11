@@ -187,6 +187,7 @@ public class MainActivity extends AppCompatActivity {
                 if(response.code() == 201) {
                     Toast.makeText(MainActivity.this, "Upload berhasil", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(MainActivity.this, result_activity.class);
+                    startActivity(intent);
                 }
                 else{
                     String.valueOf(response.code());

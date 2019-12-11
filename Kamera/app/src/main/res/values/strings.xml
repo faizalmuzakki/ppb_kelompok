@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Kamera</string>
     <string name="foto">Ambil Foto</string>
-    <string name="upload">Upload Foto</string>
+    <string name="upload">Upload</string>
+    <string name="predict">Predict</string>
     <string name="label">Label</string>
 </resources>

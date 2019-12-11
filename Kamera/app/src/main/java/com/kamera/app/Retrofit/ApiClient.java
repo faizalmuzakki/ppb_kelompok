@@ -17,4 +17,10 @@ public interface ApiClient {
             @Url String url,
             @Field("image") String image
     );
+
+    @POST
+    Call<ApiResponse> predict(
+            @Url String url,
+            @Field("image") String image
+    );
 }

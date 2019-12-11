@@ -127,6 +127,43 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void predict(View v){
+        String encodedImage = "";
+        BitmapDrawable drawable = (BitmapDrawable) iv.getDrawable();
+        Bitmap bitmap = drawable.getBitmap();
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+        try {
+            encodedImage = URLEncoder.encode(Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        encodedImage = "data:image/png;base64," + encodedImage;
+
+        ApiClient api = Server.getClient().create(ApiClient.class);
+        Call<ApiResponse> store_image = api.predict(label.getText().toString(), encodedImage);
+        store_image.enqueue(new Callback<ApiResponse>() {
+            @Override
+            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+                if(response.code() == 201) {
+                    Toast.makeText(MainActivity.this, "Predict berhasil", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(MainActivity.this, result_activity.class);
+                }
+                else{
+                    String.valueOf(response.code());
+                    Toast.makeText(MainActivity.this, "Upload gagal", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse> call, Throwable t) {
+                Toast.makeText(MainActivity.this, "Upload gagal", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     public void uploadImage(View v){
         String encodedImage = "";
         BitmapDrawable drawable = (BitmapDrawable) iv.getDrawable();

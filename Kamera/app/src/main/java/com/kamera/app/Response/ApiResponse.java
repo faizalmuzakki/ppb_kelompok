@@ -9,4 +9,11 @@ public class ApiResponse {
     public String getMessage() {
         return message;
     }
+
+    @SerializedName("label")
+    private String label;
+
+    public String getLabel() {
+        return label;
+    }
 }

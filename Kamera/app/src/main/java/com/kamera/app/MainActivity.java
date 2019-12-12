@@ -1,10 +1,10 @@
 package com.kamera.app;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -31,11 +31,17 @@ import com.kamera.app.Retrofit.Server;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.URLEncoder;
 import java.util.Date;
+import java.util.HashMap;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -127,39 +133,63 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void predict(View v){
-        String encodedImage = "";
-        BitmapDrawable drawable = (BitmapDrawable) iv.getDrawable();
-        Bitmap bitmap = drawable.getBitmap();
+    private File createTempFile(Bitmap bitmap) {
+        File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+                , System.currentTimeMillis() +"_image.webp");
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+        bitmap.compress(Bitmap.CompressFormat.WEBP,0, bos);
+        byte[] bitmapdata = bos.toByteArray();
+        //write the bytes in file
+
         try {
-            encodedImage = URLEncoder.encode(Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
+            FileOutputStream fos = new FileOutputStream(file);
+            fos.write(bitmapdata);
+            fos.flush();
+            fos.close();
+        } catch (IOException e) {
             e.printStackTrace();
         }
+        return file;
+    }
 
-        encodedImage = "data:image/png;base64," + encodedImage;
+    @NonNull
+    private RequestBody createPartFromString(String descriptionString) {
+        return RequestBody.create(
+                okhttp3.MultipartBody.FORM, descriptionString);
+    }
 
+    public void predict(View v){
+        HashMap<String, RequestBody> map = new HashMap<>();
+        map.put("nrp", createPartFromString("05111640000120"));
+//convert gambar jadi File terlebih dahulu dengan memanggil createTempFile yang di atas tadi.
+
+        BitmapDrawable drawable = (BitmapDrawable) iv.getDrawable();
+        Bitmap bitmap = drawable.getBitmap();
+        File file = createTempFile(bitmap);
+        RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), file);
+        MultipartBody.Part body = MultipartBody.Part.createFormData("cycle", file.getName(), reqFile);
+
+// finally, kirim map dan body pada param interface retrofit
         ApiClient api = Server.getClient().create(ApiClient.class);
-        Call<ApiResponse> store_image = api.predict(label.getText().toString(), encodedImage);
-        store_image.enqueue(new Callback<ApiResponse>() {
+        Call<ApiResponse> call = api.predict(body, map);
+        call.enqueue(new Callback<ApiResponse>() {
             @Override
             public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
                 if(response.code() == 201) {
-                    Toast.makeText(MainActivity.this, "Predict berhasil", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(MainActivity.this, result_activity.class);
+                    intent.putExtra("message", response.body().getMessage());
+                    startActivity(intent);
                 }
                 else{
                     String.valueOf(response.code());
-                    Toast.makeText(MainActivity.this, "Upload gagal", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Predict gagal", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<ApiResponse> call, Throwable t) {
-                Toast.makeText(MainActivity.this, "Upload gagal", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Predict gagal", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -186,8 +216,6 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
                 if(response.code() == 201) {
                     Toast.makeText(MainActivity.this, "Upload berhasil", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(MainActivity.this, result_activity.class);
-                    startActivity(intent);
                 }
                 else{
                     String.valueOf(response.code());
@@ -200,10 +228,6 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "Upload gagal", Toast.LENGTH_SHORT).show();
             }
         });
-
-//        iv.setImageResource(android.R.color.transparent);
-//        label.setVisibility(View.GONE);
-//        btnUpload.setVisibility(View.GONE);
     }
 
     private void prosesKamera(Intent datanya){

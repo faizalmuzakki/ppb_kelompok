@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
         File file = createTempFile(bitmap);
         RequestBody image = RequestBody.create(MediaType.parse("image/*"), file);
         MultipartBody.Part body = MultipartBody.Part.createFormData("image", file.getName(), image);
-
+        picUri = Uri.fromFile(file);
         // finally, kirim map dan body pada param interface retrofit
         ApiClient api = Server.getClient().create(ApiClient.class);
         Call<String> call = api.predict(body);
@@ -174,6 +174,7 @@ public class MainActivity extends AppCompatActivity {
                 if(response.isSuccessful()) {
                     Intent intent = new Intent(MainActivity.this, result_activity.class);
                     intent.putExtra("label", response.body());
+                    intent.putExtra("gambar", picUri.toString());
                     startActivity(intent);
 //                    Toast.makeText(MainActivity.this, "" + response.message()+" "+response.code()+" "+response.body(), Toast.LENGTH_SHORT).show();
                 }

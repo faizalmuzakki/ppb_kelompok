@@ -167,10 +167,10 @@ public class MainActivity extends AppCompatActivity {
 
         // finally, kirim map dan body pada param interface retrofit
         ApiClient api = Server.getClient().create(ApiClient.class);
-        Call<ApiResponse> call = api.predict(body);
-        call.enqueue(new Callback<ApiResponse>() {
+        Call<String> call = api.predict(body);
+        call.enqueue(new Callback<String>() {
             @Override
-            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+            public void onResponse(Call<String> call, Response<String> response) {
                 if(response.code() == 201) {
                     Intent intent = new Intent(MainActivity.this, result_activity.class);
                     intent.putExtra("label", response.body().toString());
@@ -183,47 +183,47 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<ApiResponse> call, Throwable t) {
+            public void onFailure(Call<String> call, Throwable t) {
                 Toast.makeText(MainActivity.this, "Predict gagal", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     public void uploadImage(View v){
-        String encodedImage = "";
-        BitmapDrawable drawable = (BitmapDrawable) iv.getDrawable();
-        Bitmap bitmap = drawable.getBitmap();
-
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-        try {
-            encodedImage = URLEncoder.encode(Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        String url = "ppb19/api/dataset/5111640000120/" + label.getText().toString();
-        encodedImage = "data:image/png;base64," + encodedImage;
-
-        ApiClient api = Server.getClient().create(ApiClient.class);
-        Call<ApiResponse> store_image = api.store_image(url, encodedImage);
-        store_image.enqueue(new Callback<ApiResponse>() {
-            @Override
-            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
-                if(response.code() == 201) {
-                    Toast.makeText(MainActivity.this, "Upload berhasil", Toast.LENGTH_SHORT).show();
-                }
-                else{
-                    String.valueOf(response.code());
-                    Toast.makeText(MainActivity.this, "Upload gagal", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ApiResponse> call, Throwable t) {
-                Toast.makeText(MainActivity.this, "Upload gagal", Toast.LENGTH_SHORT).show();
-            }
-        });
+//        String encodedImage = "";
+//        BitmapDrawable drawable = (BitmapDrawable) iv.getDrawable();
+//        Bitmap bitmap = drawable.getBitmap();
+//
+//        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+//        try {
+//            encodedImage = URLEncoder.encode(Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT), "UTF-8");
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        }
+//
+//        String url = "ppb19/api/dataset/5111640000120/" + label.getText().toString();
+//        encodedImage = "data:image/png;base64," + encodedImage;
+//
+//        ApiClient api = Server.getClient().create(ApiClient.class);
+//        Call<ApiResponse> store_image = api.store_image(url, encodedImage);
+//        store_image.enqueue(new Callback<ApiResponse>() {
+//            @Override
+//            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+//                if(response.code() == 201) {
+//                    Toast.makeText(MainActivity.this, "Upload berhasil", Toast.LENGTH_SHORT).show();
+//                }
+//                else{
+//                    String.valueOf(response.code());
+//                    Toast.makeText(MainActivity.this, "Upload gagal", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<ApiResponse> call, Throwable t) {
+//                Toast.makeText(MainActivity.this, "Upload gagal", Toast.LENGTH_SHORT).show();
+//            }
+//        });
     }
 
     private void prosesKamera(Intent datanya){

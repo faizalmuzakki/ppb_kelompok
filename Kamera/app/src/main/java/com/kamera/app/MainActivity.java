@@ -134,10 +134,10 @@ public class MainActivity extends AppCompatActivity {
 
     private File createTempFile(Bitmap bitmap) {
         File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-                , System.currentTimeMillis() +"_image.webp");
+                , System.currentTimeMillis() +"_image.png");
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
-        bitmap.compress(Bitmap.CompressFormat.WEBP,0, bos);
+        bitmap.compress(Bitmap.CompressFormat.PNG,100, bos);
         byte[] bitmapdata = bos.toByteArray();
         //write the bytes in file
 
@@ -171,9 +171,9 @@ public class MainActivity extends AppCompatActivity {
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                if(response.code() == 201) {
+                if(response.isSuccessful()) {
                     Intent intent = new Intent(MainActivity.this, result_activity.class);
-                    intent.putExtra("label", response.body().toString());
+                    intent.putExtra("label", response.body());
                     startActivity(intent);
                 }
                 else{

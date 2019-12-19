@@ -172,9 +172,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 if(response.isSuccessful()) {
-                    Intent intent = new Intent(MainActivity.this, result_activity.class);
-                    intent.putExtra("label", response.body());
-                    startActivity(intent);
+//                    Intent intent = new Intent(MainActivity.this, result_activity.class);
+//                    intent.putExtra("label", response.body());
+//                    startActivity(intent);
+                    Toast.makeText(MainActivity.this, "" + response.message()+" "+response.code()+" "+response.body(), Toast.LENGTH_SHORT).show();
                 }
                 else{
                     String.valueOf(response.code());
@@ -184,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                Toast.makeText(MainActivity.this, "Predict gagal", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Predict gagal" + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

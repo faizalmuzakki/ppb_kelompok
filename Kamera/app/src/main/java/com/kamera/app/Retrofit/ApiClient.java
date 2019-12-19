@@ -10,6 +10,7 @@ import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.Headers;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
 import retrofit2.http.PartMap;
@@ -24,9 +25,9 @@ public interface ApiClient {
             @Field("image") String image
     );
 
+    @Multipart
     @POST("ppb-predict/2/predict")
     Call<ApiResponse> predict(
-            @Part MultipartBody.Part photo,
-            @PartMap Map<String,RequestBody> text
+            @Part("image") MultipartBody.Part photo
     );
 }

@@ -160,8 +160,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void predict(View v){
-        HashMap<String, RequestBody> map = new HashMap<>();
-        map.put("nrp", createPartFromString("05111640000120"));
 //convert gambar jadi File terlebih dahulu dengan memanggil createTempFile yang di atas tadi.
 
         BitmapDrawable drawable = (BitmapDrawable) iv.getDrawable();
@@ -172,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
 
 // finally, kirim map dan body pada param interface retrofit
         ApiClient api = Server.getClient().create(ApiClient.class);
-        Call<ApiResponse> call = api.predict(body, map);
+        Call<ApiResponse> call = api.predict(body);
         call.enqueue(new Callback<ApiResponse>() {
             @Override
             public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
@@ -183,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else{
                     String.valueOf(response.code());
-                    Toast.makeText(MainActivity.this, "Predict gagal", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Predict gagal " + response.code(), Toast.LENGTH_SHORT).show();
                 }
             }
 

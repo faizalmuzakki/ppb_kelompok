@@ -37,7 +37,6 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.URLEncoder;
 import java.util.Date;
-import java.util.HashMap;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -160,15 +159,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void predict(View v){
-//convert gambar jadi File terlebih dahulu dengan memanggil createTempFile yang di atas tadi.
-
         BitmapDrawable drawable = (BitmapDrawable) iv.getDrawable();
         Bitmap bitmap = drawable.getBitmap();
         File file = createTempFile(bitmap);
-        RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), file);
-        MultipartBody.Part body = MultipartBody.Part.createFormData("cycle", file.getName(), reqFile);
+        RequestBody image = RequestBody.create(MediaType.parse("image/*"), file);
+        MultipartBody.Part body = MultipartBody.Part.createFormData("image", file.getName(), image);
 
-// finally, kirim map dan body pada param interface retrofit
+        // finally, kirim map dan body pada param interface retrofit
         ApiClient api = Server.getClient().create(ApiClient.class);
         Call<ApiResponse> call = api.predict(body);
         call.enqueue(new Callback<ApiResponse>() {

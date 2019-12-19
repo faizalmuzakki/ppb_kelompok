@@ -28,6 +28,6 @@ public interface ApiClient {
     @Multipart
     @POST("ppb-predict/2/predict")
     Call<ApiResponse> predict(
-            @Part("image") MultipartBody.Part photo
+            @Part MultipartBody.Part image
     );
 }

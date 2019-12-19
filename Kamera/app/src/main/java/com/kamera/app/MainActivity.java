@@ -49,7 +49,7 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button b1, btnUpload;
+    Button b1, btnUpload, btnPredict;
     ImageView iv;
     private static final int kodekamera=222;
     private static final int MY_PERMISSIONS_REQUEST_WRITE=223;
@@ -59,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
     final int PIC_CROP = 3;
     final int CAMERA_CAPTURE = 1;
     private Uri picUri;
+    Bitmap bitmap;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,6 +102,14 @@ public class MainActivity extends AppCompatActivity {
                 onSelectImageClick(view);
             }
         });
+
+        btnPredict = (Button) findViewById(R.id.btnPredict);
+        btnPredict.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                predict();
+            }
+        });
     }
 
     @Override
@@ -126,6 +136,9 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 iv.setImageURI(result.getUri());
                 Toast.makeText(this, "Cropping successful", Toast.LENGTH_LONG).show();
+
+                BitmapDrawable drawable = (BitmapDrawable) iv.getDrawable();
+                bitmap = drawable.getBitmap();
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Toast.makeText(this, "Cropping failed: " + result.getError(), Toast.LENGTH_LONG).show();
             }
@@ -158,12 +171,15 @@ public class MainActivity extends AppCompatActivity {
                 okhttp3.MultipartBody.FORM, descriptionString);
     }
 
-    public void predict(View v){
-        BitmapDrawable drawable = (BitmapDrawable) iv.getDrawable();
-        Bitmap bitmap = drawable.getBitmap();
-        File file = createTempFile(bitmap);
-        RequestBody image = RequestBody.create(MediaType.parse("image/*"), file);
-        MultipartBody.Part body = MultipartBody.Part.createFormData("image", file.getName(), image);
+    public void predict(){
+        Toast.makeText(MainActivity.this, "Sedang melakukan prediksi...", Toast.LENGTH_SHORT).show();
+//        File file = createTempFile(bitmap);
+
+        ByteArrayOutputStream baos =  new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+
+        RequestBody image = RequestBody.create(MediaType.parse("image/*"), baos.toByteArray());
+        MultipartBody.Part body = MultipartBody.Part.createFormData("image", "hand sign", image);
 
         // finally, kirim map dan body pada param interface retrofit
         ApiClient api = Server.getClient().create(ApiClient.class);
@@ -175,7 +191,6 @@ public class MainActivity extends AppCompatActivity {
                     Intent intent = new Intent(MainActivity.this, result_activity.class);
                     intent.putExtra("label", response.body());
                     startActivity(intent);
-//                    Toast.makeText(MainActivity.this, "" + response.message()+" "+response.code()+" "+response.body(), Toast.LENGTH_SHORT).show();
                 }
                 else{
                     String.valueOf(response.code());

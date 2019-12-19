@@ -23,6 +23,7 @@ public class result_activity extends AppCompatActivity {
 
         alphabetResult = findViewById(R.id.alphabetResult);
         Integer label = Integer.parseInt(intent.getStringExtra("label"));
-        alphabetResult.setText(alphabet[label]);
+
+        alphabetResult.setText(String.valueOf(alphabet[label]));
     }
 }

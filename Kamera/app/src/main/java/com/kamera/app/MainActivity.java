@@ -172,10 +172,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 if(response.isSuccessful()) {
-//                    Intent intent = new Intent(MainActivity.this, result_activity.class);
-//                    intent.putExtra("label", response.body());
-//                    startActivity(intent);
-                    Toast.makeText(MainActivity.this, "" + response.message()+" "+response.code()+" "+response.body(), Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(MainActivity.this, result_activity.class);
+                    intent.putExtra("label", response.body());
+                    startActivity(intent);
+//                    Toast.makeText(MainActivity.this, "" + response.message()+" "+response.code()+" "+response.body(), Toast.LENGTH_SHORT).show();
                 }
                 else{
                     String.valueOf(response.code());

@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
         return RequestBody.create(
                 okhttp3.MultipartBody.FORM, descriptionString);
     }
-
+    
     public void predict(){
         Toast.makeText(MainActivity.this, "Sedang melakukan prediksi...", Toast.LENGTH_SHORT).show();
 //        File file = createTempFile(bitmap);
@@ -180,6 +180,7 @@ public class MainActivity extends AppCompatActivity {
 
         RequestBody image = RequestBody.create(MediaType.parse("image/*"), baos.toByteArray());
         MultipartBody.Part body = MultipartBody.Part.createFormData("image", "hand sign", image);
+        picUri = Uri.fromFile(file);
 
         // finally, kirim map dan body pada param interface retrofit
         ApiClient api = Server.getClient().create(ApiClient.class);
@@ -190,6 +191,7 @@ public class MainActivity extends AppCompatActivity {
                 if(response.isSuccessful()) {
                     Intent intent = new Intent(MainActivity.this, result_activity.class);
                     intent.putExtra("label", response.body());
+                    intent.putExtra("gambar", picUri.toString());
                     startActivity(intent);
                 }
                 else{

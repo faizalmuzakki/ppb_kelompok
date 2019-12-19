@@ -24,7 +24,7 @@ public interface ApiClient {
             @Field("image") String image
     );
 
-    @POST
+    @POST("ppb-predict/2/predict")
     Call<ApiResponse> predict(
             @Part MultipartBody.Part photo,
             @PartMap Map<String,RequestBody> text

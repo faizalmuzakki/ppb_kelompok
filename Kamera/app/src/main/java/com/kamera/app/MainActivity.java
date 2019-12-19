@@ -178,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
                 if(response.code() == 201) {
                     Intent intent = new Intent(MainActivity.this, result_activity.class);
-                    intent.putExtra("message", response.body().getMessage());
+                    intent.putExtra("label", response.body().toString());
                     startActivity(intent);
                 }
                 else{
@@ -207,10 +207,11 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        String url = "ppb19/api/dataset/5111640000120/" + label.getText().toString();
         encodedImage = "data:image/png;base64," + encodedImage;
 
         ApiClient api = Server.getClient().create(ApiClient.class);
-        Call<ApiResponse> store_image = api.store_image(label.getText().toString(), encodedImage);
+        Call<ApiResponse> store_image = api.store_image(url, encodedImage);
         store_image.enqueue(new Callback<ApiResponse>() {
             @Override
             public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {

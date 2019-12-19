@@ -9,7 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Server {
     private static String nrp = "05111640000120";
-    private static final String BASE_URL = "http://mobile.if.its.ac.id/ppb19/api/dataset/" + nrp + "/";
+    private static final String BASE_URL = "http://mobile.if.its.ac.id/";
     private static Retrofit retrofit = null;
 
     public static Retrofit getClient() {

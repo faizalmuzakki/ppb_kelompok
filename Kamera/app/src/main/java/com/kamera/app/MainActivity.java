@@ -173,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
     
     public void predict(){
         Toast.makeText(MainActivity.this, "Sedang melakukan prediksi...", Toast.LENGTH_SHORT).show();
-//        File file = createTempFile(bitmap);
+        File file = createTempFile(bitmap);
 
         ByteArrayOutputStream baos =  new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
